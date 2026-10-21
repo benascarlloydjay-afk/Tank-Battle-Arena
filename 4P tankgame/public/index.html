@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tank Battle Arena</title>
+
+    <meta name="tank-ws-url" content="">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main>
+
+        <section id="welcomeScreen" class="welcome-screen">
+            <h1>TANK BATTLE ARENA</h1>
+            <button id="playButton" type="button">PLAY</button>
+        </section>
+
+        <section id="loginScreen" class="login-screen hidden">
+
+            <h2>TANK BATTLE ARENA</h2>
+
+            <p id="authIntro">Sign in to play online, or create an account to get started.</p>
+
+            <form id="authForm" class="auth-form">
+                <label for="authUsername">Username</label>
+                <input id="authUsername" name="username" maxlength="24" minlength="3" autocomplete="username" required>
+                <label for="authPassword">Password</label>
+                <input id="authPassword" name="password" type="password" minlength="8" maxlength="72" autocomplete="current-password" required>
+                <label id="passwordConfirmLabel" for="authPasswordConfirm" class="hidden">Confirm password</label>
+                <input id="authPasswordConfirm" name="password_confirmation" type="password" minlength="8" maxlength="72" autocomplete="new-password" class="hidden" disabled>
+                <label id="birthDateLabel" for="authBirthDate" class="hidden">Birth date</label>
+                <input id="authBirthDate" name="birth_date" type="date" autocomplete="bday" class="hidden" disabled>
+                <button id="authSubmit" type="submit">SIGN IN</button>
+                <button id="authModeToggle" class="back-button" type="button">Need an account? Sign up</button>
+            </form>
+
+            <section id="accountBar" class="account-bar hidden" aria-live="polite">
+                <span>Signed in as <strong id="accountUsername"></strong></span>
+                <button id="signOutButton" type="button" class="back-button">Sign out</button>
+            </section>
+
+            <section id="onboarding" class="onboarding hidden" aria-live="polite">
+                <div id="deviceChoiceStep" class="onboarding-card">
+                    <p class="onboarding-eyebrow">PLAYER SETUP · 1 OF 2</p>
+                    <h3>Where are you playing?</h3>
+                    <p>Choose the controls for this device.</p>
+                    <div class="onboarding-options">
+                        <button type="button" class="onboarding-option" data-control-mode="pc">
+                            <strong>PC / Keyboard</strong>
+                            <span>Move and fight with your keyboard.</span>
+                        </button>
+                        <button type="button" class="onboarding-option" data-control-mode="mobile">
+                            <strong>Mobile / Touch</strong>
+                            <span>Use the on-screen movement pad and action buttons.</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="experienceChoiceStep" class="onboarding-card hidden">
+                    <p class="onboarding-eyebrow">PLAYER SETUP · 2 OF 2</p>
+                    <h3>How familiar are you with the game?</h3>
+                    <div class="onboarding-options">
+                        <button id="newbieButton" type="button" class="onboarding-option">
+                            <strong>Newbie</strong>
+                            <span>Show me how to move, shoot, use skills, and win.</span>
+                        </button>
+                        <button id="veteranButton" type="button" class="onboarding-option">
+                            <strong>Veteran</strong>
+                            <span>I know the basics. Take me to room setup.</span>
+                        </button>
+                    </div>
+                    <button id="backToDeviceChoiceButton" type="button" class="back-button onboarding-back">Change device</button>
+                </div>
+
+                <div id="tutorialStep" class="onboarding-card tutorial-card hidden">
+                    <p class="onboarding-eyebrow">NEW PLAYER TUTORIAL</p>
+                    <p id="tutorialProgress" class="tutorial-progress">Step 1 of 5</p>
+                    <h3 id="tutorialTitle">Welcome to the arena</h3>
+                    <p id="tutorialText" class="tutorial-copy"></p>
+                    <div class="tutorial-practice">
+                        <div class="tutorial-practice-board">
+                            <div id="tutorialGrid" class="tutorial-grid" role="grid" aria-label="Tank practice arena"></div>
+                            <p id="tutorialGridMessage" class="tutorial-grid-message" aria-live="polite">Your tank is ready. Move around the grid to practice.</p>
+                        </div>
+                        <div class="tutorial-practice-controls">
+                            <p id="tutorialControlHint" class="tutorial-control-hint">Use W/A/S/D or arrow keys to move and turn.</p>
+                            <div class="tutorial-direction-pad" aria-label="Practice movement controls">
+                                <button type="button" data-tutorial-move="up" aria-label="Drive forward">▲</button>
+                                <button type="button" data-tutorial-move="left" aria-label="Turn left">◀</button>
+                                <button type="button" data-tutorial-move="right" aria-label="Turn right">▶</button>
+                                <button type="button" data-tutorial-move="down" aria-label="Reverse">▼</button>
+                            </div>
+                            <div class="tutorial-action-buttons">
+                                <button id="tutorialShootButton" type="button">SHOOT</button>
+                                <button id="tutorialSkillButton" type="button" disabled>USE SKILL</button>
+                            </div>
+                            <p id="tutorialSkillStatus" class="tutorial-skill-status">SKILL: NONE</p>
+                        </div>
+                    </div>
+                    <div class="tutorial-actions">
+                        <button id="tutorialBackButton" type="button" class="back-button">Previous</button>
+                        <button id="tutorialNextButton" type="button">Next</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="matchSettings" class="match-settings hidden" aria-labelledby="matchSettingsTitle">
+                <h3 id="matchSettingsTitle">Battle Rules</h3>
+
+                <div class="category-rule">
+                    <span class="rule-label">Game category</span>
+                    <div class="game-category-options" role="group" aria-label="Game category">
+                        <button type="button" class="game-category-option selected" data-category="ffa" aria-pressed="true">
+                            <span class="category-option-title">Free for all</span>
+                            <span class="category-option-detail">Every tank fights for itself</span>
+                        </button>
+                        <button type="button" class="game-category-option" data-category="2v2" aria-pressed="false">
+                            <span class="category-option-title">2 vs 2</span>
+                            <span class="category-option-detail">Blue team vs Red team · no friendly fire</span>
+                        </button>
+                    </div>
+                    <select id="gameCategory" class="hidden" aria-hidden="true" tabindex="-1">
+                        <option value="ffa" selected>Free for all</option>
+                        <option value="2v2">2 vs 2 teams</option>
+                    </select>
+                    <p id="categoryHint" aria-live="polite">All other tanks are opponents.</p>
+                </div>
+
+                <div class="player-count-rule hidden">
+                    <span id="playerCountLabel" class="rule-label">Players</span>
+                    <div class="player-count-options" role="group" aria-labelledby="playerCountLabel">
+                        <button type="button" class="player-count-option" data-count="2" aria-pressed="false">2</button>
+                        <button type="button" class="player-count-option" data-count="3" aria-pressed="false">3</button>
+                        <button type="button" class="player-count-option" data-count="4" aria-pressed="true">4</button>
+                    </div>
+                    <select id="playerCount" class="hidden" aria-hidden="true" tabindex="-1">
+                        <option value="2">2 Players</option>
+                        <option value="3">3 Players</option>
+                        <option value="4" selected>4 Players</option>
+                    </select>
+                </div>
+
+                <div class="rules-grid">
+                    <div class="rule-field">
+                        <label for="timeLimitMinutes">Time limit</label>
+                        <div class="rule-input-wrap"><input id="timeLimitMinutes" type="number" min="1" max="10" step="1" value="5" required><span>min</span></div>
+                    </div>
+                    <div class="rule-field">
+                        <label for="deathLimit">Deaths per player</label>
+                        <input id="deathLimit" type="number" min="1" max="1000" step="1" value="5" required>
+                    </div>
+                    <div class="rule-field">
+                        <label for="skillAmount">Max skill crates</label>
+                        <input id="skillAmount" type="number" min="1" max="50" step="1" value="10" required>
+                    </div>
+                    <div class="rule-field">
+                        <label for="movementStyleAll">Tank movement style</label>
+                        <select id="movementStyleAll" class="movement-style-select">
+                            <option value="turn-drive" selected>Turn and drive</option>
+                            <option value="spin-drive">Spin and drive</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div id="roomForm" class="room-form hidden">
+                <div class="room-actions">
+                    <label for="roomCode">Room code</label>
+                    <input id="roomCode" maxlength="6" autocomplete="off" placeholder="Enter a friend's code">
+                    <button id="createRoomButton" type="button">CREATE ROOM</button>
+                    <button id="joinRoomButton" type="button">JOIN ROOM</button>
+                </div>
+            </div>
+
+            <div id="setupActions" class="setup-actions">
+                <button id="backToWelcomeButton" type="button" class="back-button">Back</button>
+                <button id="joinButton" type="button" class="hidden">JOIN BATTLE</button>
+                <button id="startRoomButton" type="button" class="hidden" disabled>START BATTLE</button>
+            </div>
+
+            <p id="loginMessage" role="status"></p>
+
+        </section>
+
+        <section id="gameScreen" class="hidden">
+
+            <div class="game-toolbar">
+                <div>
+                    <h2><span class="brand-mark">T</span> TANK BATTLE ARENA</h2>
+                    <p id="roomStatus">Room match</p>
+                </div>
+
+                <div id="matchTimer" class="match-timer" aria-live="polite">05:00</div>
+                <button id="restartButton">Restart Game</button>
+                <button id="backToRegistrationButton" class="back-button">Leave Match</button>
+                <section class="kill-feed" aria-live="polite">
+                    <h2>Battle Log</h2>
+                    <ul id="killFeedList">
+                        <li>Elimination announcements will appear here.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="player-hud-row" aria-label="Match standings">
+                <article class="hud-card" data-player-slot="0"><span class="hud-badge">P1</span><span class="hud-title">PLAYER 1</span><div id="info0" class="player-info">Waiting</div></article>
+                <article class="hud-card" data-player-slot="1"><span class="hud-badge">P2</span><span class="hud-title">PLAYER 2</span><div id="info1" class="player-info">Waiting</div></article>
+                <article class="hud-card" data-player-slot="2"><span class="hud-badge">P3</span><span class="hud-title">PLAYER 3</span><div id="info2" class="player-info">Waiting</div></article>
+                <article class="hud-card" data-player-slot="3"><span class="hud-badge">P4</span><span class="hud-title">PLAYER 4</span><div id="info3" class="player-info">Waiting</div></article>
+            </div>
+
+            <div class="player-grid">
+
+                <article class="player-panel">
+                    <canvas id="canvas0" width="640" height="400"></canvas>
+
+
+                    <p class="controls" id="controls0">
+                        Move: W A S D | Shoot: SPACE | Skill: Q
+                    </p>
+                </article>
+
+                <article class="player-panel">
+                    <canvas id="canvas1" width="640" height="400"></canvas>
+
+
+                    <p class="controls" id="controls1">
+                        Move: ARROWS | Shoot: ENTER | Skill: M
+                    </p>
+                </article>
+
+                <article class="player-panel">
+                    <canvas id="canvas2" width="640" height="400"></canvas>
+
+
+                    <p class="controls" id="controls2">
+                        Move: I J K L | Shoot: U | Skill: O
+                    </p>
+                </article>
+
+                <article class="player-panel">
+                    <canvas id="canvas3" width="640" height="400"></canvas>
+
+
+                    <p class="controls" id="controls3">
+                        Move: 8 / 4 / 5 / 6 | Shoot: 9 | Skill: 7
+                    </p>
+                </article>
+
+            </div>
+
+            <section id="touchControls" class="touch-controls" aria-label="Touch controls">
+                <div class="touch-pad" aria-label="Movement">
+                    <button type="button" class="touch-up" data-touch-input="up" aria-label="Move up">▲</button>
+                    <button type="button" class="touch-left" data-touch-input="left" aria-label="Turn or move left">◀</button>
+                    <button type="button" class="touch-right" data-touch-input="right" aria-label="Turn or move right">▶</button>
+                    <button type="button" class="touch-down" data-touch-input="down" aria-label="Move down">▼</button>
+                </div>
+                <div class="touch-actions">
+                    <button type="button" data-touch-input="shoot" aria-label="Shoot">SHOOT</button>
+                    <button type="button" data-touch-input="skill" aria-label="Use skill">SKILL</button>
+                </div>
+            </section>
+
+            <p class="skill-help">
+                Collect a glowing crate, then press your Skill key. Pickups rotate between homing rockets, landmines (3 uses),
+                wall-piercing lasers (one-hit kill), bouncing lasers, gatling bursts, big bullets (5 shots), tank shrink, armor, and HP kits (+50 HP).
+            </p>
+
+            <aside class="game-sidebar">
+                <section class="leaderboard">
+                    <h2>Leaderboard</h2>
+
+                    <button id="refreshLeaderboard">
+                        Refresh Leaderboard
+                    </button>
+
+                    <label for="leaderboardSort">Sort by</label>
+                    <select id="leaderboardSort">
+                        <option value="scores">Most Scores</option>
+                        <option value="kills">Most Kills</option>
+                        <option value="wins">Most Wins</option>
+                    </select>
+                    <ol id="leaderboardList">
+                        <li>Leaderboard will appear here.</li>
+                    </ol>
+                </section>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+    <div id="matchOver" class="match-over hidden" role="alertdialog" aria-modal="true" aria-labelledby="matchOverTitle">
+        <div class="match-over-card">
+            <h2 id="matchOverTitle">GAME OVER</h2>
+            <p id="matchOverMessage"></p>
+            <table class="final-standings">
+                <thead>
+                    <tr><th>Place</th><th>Player</th><th>Score</th><th>Kills</th><th>Deaths</th></tr>
+                </thead>
+                <tbody id="finalStandings"></tbody>
+            </table>
+            <button id="playAgainButton">Play Again</button>
+            <button id="resultsBackButton" class="back-button">Back to Registration</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Tank Battle Arena | XAMPP + PHP + MySQL</p>
+    </footer>
+
+    <script src="game-engine.js"></script>
+    <script src="game.js"></script>
+
+</body>
+</html>

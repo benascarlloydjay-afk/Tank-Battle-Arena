@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: tank-battle-rooms
+    runtime: node
+    plan: free
+    rootDir: room-server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: ROOM_TICKET_SECRET
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false

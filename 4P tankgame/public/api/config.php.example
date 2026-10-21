@@ -1,0 +1,10 @@
+<?php
+// Copy this file to config.php on the web host and fill in the values from its control panel.
+return [
+    'DB_HOST' => 'your-mysql-host',
+    'DB_NAME' => 'your-prefixed-database-name',
+    'DB_USER' => 'your-prefixed-database-user',
+    'DB_PASSWORD' => 'your-database-password',
+    // Use the same random secret as ROOM_TICKET_SECRET on the room-server host.
+    'ROOM_TICKET_SECRET' => 'replace-with-at-least-32-random-bytes',
+];
